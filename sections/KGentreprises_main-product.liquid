@@ -228,7 +228,7 @@
                   </span>
                 </label>
                 <quantity-input class="quantity">
-                  <button class="quantity__button no-js-hidden" name="minus" type="button" onclick="minusQuantity()">
+                  <button class="quantity__button no-js-hidden" name="minus" type="button">
                     <span class="visually-hidden">
                       {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
                     </span>
@@ -236,22 +236,21 @@
                   </button>
                   <input
                     class="quantity__input"
-                    onchange="kgmindix()"
                     type="number"
                     name="quantity"
                     id="Quantity-{{ section.id }}"
                     data-cart-quantity="{{ cart_qty }}"
-                    data-min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
-                    min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                    data-min="10"
+                    min="10"
                     {% if product.selected_or_first_available_variant.quantity_rule.max != null %}
                       data-max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
                       max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
                     {% endif %}
                     step="{{ product.selected_or_first_available_variant.quantity_rule.increment }}"
-                    value="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                    value="10"
                     form="{{ product_form_id }}"
                   />
-                  <button class="quantity__button no-js-hidden" name="plus" type="button" onclick="plusQuantity()">
+                  <button class="quantity__button no-js-hidden" name="plus" type="button">
                     <span class="visually-hidden">
                       {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}  
                     </span>
@@ -571,76 +570,7 @@
     }
   </script>
 
-<script>
 
-  
-function plusQuantity() {
-
-
-
-    // Trouver l'élément de quantité
-    var quantityElement = document.querySelector('.quantity__input');
-
-        // Obtenir la quantité actuelle
-        var currentQuantity = parseInt(quantityElement.value);
-
-
-
-
-            newQuantity = Math.ceil((currentQuantity +1) / 10) * 10 -1 ;
-
-              
-            quantityElement.value = newQuantity; 
-
-}
-
-
-  function minusQuantity() {
-
-
-
-    // Trouver l'élément de quantité
-    var quantityElement = document.querySelector('.quantity__input');
-
-        // Obtenir la quantité actuelle
-        var currentQuantity = parseInt(quantityElement.value);
-
-
-
-
-            newQuantity = Math.floor((currentQuantity -1) / 10) * 10 +1 ;
-
-              
-            quantityElement.value = newQuantity; 
-
-    if(newQuantity == 1)
-    {
-      quantityElement.value = 11;
-    }
-
-}
-  function kgmindix() {
-
-       // Trouver l'élément de quantité
-    var quantityElement = document.querySelector('.quantity__input');
-
-        // Obtenir la quantité actuelle
-        var currentQuantity = parseInt(quantityElement.value);
-
-        if(currentQuantity < 10)
-    {
-      quantityElement.value = 10;
-    }
-    
-  }
-            
-
-window.addEventListener('DOMContentLoaded', (event) => {
-    kgmindix();
-});
-
-  
-</script>
                           
                           
 </section>

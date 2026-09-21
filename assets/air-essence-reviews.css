@@ -75,6 +75,10 @@
 .ae-photo-dialog { background: transparent; box-shadow: none; overflow: visible; }
 .ae-photo-dialog img { display: block; width: 100%; height: auto; max-height: calc(100dvh - 4rem); object-fit: contain; border-radius: 1rem; }
 
+@media screen and (min-width: 750px) {
+  .ae-reviews__title { font-size: 3.2rem; }
+}
+
 @media screen and (max-width: 749px) {
   .ae-reviews__header { align-items: stretch; flex-direction: column; margin-bottom: 2rem; }
   .ae-write-button { width: 100%; }

@@ -22,6 +22,7 @@ class CartItems extends HTMLElement {
     }, ON_CHANGE_DEBOUNCE_TIMER);
 
     this.addEventListener('change', debouncedOnChange.bind(this));
+
   }
 
   cartUpdateUnsubscriber = undefined;
@@ -33,6 +34,14 @@ class CartItems extends HTMLElement {
       }
       this.onCartUpdate();
     });
+
+    this.querySelectorAll('[data-quantity-variant-id="47135874515246"]').forEach((input) => {
+      const quantity = Number.parseInt(input.value, 10);
+      if (quantity > 0 && quantity < 10) {
+        input.value = 10;
+        this.updateQuantity(input.dataset.index, 10);
+      }
+    });
   }
 
   disconnectedCallback() {
@@ -42,7 +51,17 @@ class CartItems extends HTMLElement {
   }
 
   onChange(event) {
-    this.updateQuantity(event.target.dataset.index, event.target.value, document.activeElement.getAttribute('name'));
+    const isEnterpriseAirFreshener = event.target.dataset.quantityVariantId === '47135874515246';
+    const requestedQuantity = Number.parseInt(event.target.value, 10);
+    const quantity = isEnterpriseAirFreshener && requestedQuantity > 0 && requestedQuantity < 10
+      ? 10
+      : event.target.value;
+
+    if (quantity === 10 && requestedQuantity !== 10) {
+      event.target.value = 10;
+    }
+
+    this.updateQuantity(event.target.dataset.index, quantity, document.activeElement.getAttribute('name'));
   }
 
   onCartUpdate() {

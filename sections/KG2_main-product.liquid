@@ -1,7 +1,8 @@
 <section
   id="MainProduct-{{ section.id }}"
-  class="page-width section-{{ section.id }}-padding"
+  class="page-width section-{{ section.id }}-padding ae-personalized-product"
   data-section="{{ section.id }}"
+  data-ae-personalized-product
 >
   {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
   {{ 'component-accordion.css' | asset_url | stylesheet_tag }}
@@ -90,6 +91,22 @@
                   </h2>
                 </a>
               </div>
+              <p class="ae-product-lead">Votre photo transformée en sent-bon parfumé, imprimé recto-verso et prêt à suspendre.</p>
+              <div class="ae-product-price" aria-label="Prix à partir de {{ product.selected_or_first_available_variant.price | money }}">
+                <span>À partir de</span>
+                <strong>{{ product.selected_or_first_available_variant.price | money }}</strong>
+              </div>
+              <div class="ae-product-trust" aria-label="Les garanties Air Essence">
+                <span>Fabriqué en France</span>
+                <span>Livraison offerte dès 25 €</span>
+                <span>Impression recto-verso</span>
+              </div>
+              <ol class="ae-config-steps" aria-label="Étapes de personnalisation">
+                <li class="is-active" data-ae-progress-step="1"><span>1</span>Photo</li>
+                <li data-ae-progress-step="2"><span>2</span>Forme</li>
+                <li data-ae-progress-step="3"><span>3</span>Parfum</li>
+                <li data-ae-progress-step="4"><span>4</span>Quantité</li>
+              </ol>
             {%- when 'price' -%}
               <div class="no-js-hidden" id="price-{{ section.id }}" role="status" {{ block.shopify_attributes }}>
                 {%- render 'price',
@@ -374,9 +391,10 @@
                         {%- assign number_of_slides = recommendations.products_count | plus: 0.0 | divided_by: block.settings.products_per_page | ceil -%}
                         <div id="Slider-{{ block.id }}" class="contains-card contains-card--product complementary-slider grid grid--1-col slider slider--everywhere" role="list"{% if number_of_slides > 1 %} aria-label="{{ 'general.slider.name' | t }}"{% endif %}>
                           {%- for i in (1..number_of_slides) -%}
+                            {%- assign slide_offset = forloop.index0 | times: block.settings.products_per_page -%}
                             <div id="Slide-{{ block.id }}-{{ forloop.index }}" class="complementary-slide complementary-slide--{{ settings.card_style }} grid__item slider__slide slideshow__slide" tabindex="-1" role="group"{% if number_of_slides > 1 %} aria-roledescription="{{ 'sections.slideshow.slide' | t }}" aria-label="{{ forloop.index }} {{ 'general.slider.of' | t }} {{ forloop.length }}"{% endif %}>
                               <ul class="list-unstyled" role="list">
-                                {%- for product in recommendations.products limit: block.settings.products_per_page offset: continue -%}
+                                {%- for product in recommendations.products limit: block.settings.products_per_page offset: slide_offset -%}
                                   <li>
                                     {% render 'card-product',
                                       card_product: product,
@@ -436,6 +454,23 @@
               %}
           {%- endcase -%}
         {%- endfor -%}
+        <aside
+          class="ae-product-proof"
+          data-ae-product-proof
+          data-api-url="{{ settings.ae_reviews_api_url | escape }}"
+          data-product-handle="{{ product.handle | escape }}"
+          aria-labelledby="ae-product-proof-title-{{ section.id }}"
+          hidden
+        >
+          <div class="ae-product-proof__heading">
+            <div>
+              <p>Créations vérifiées</p>
+              <h2 id="ae-product-proof-title-{{ section.id }}">Réalisé par nos clients</h2>
+            </div>
+            <a href="#ae-reviews">Voir les avis</a>
+          </div>
+          <div class="ae-product-proof__grid" data-ae-product-proof-grid></div>
+        </aside>
         <a href="{{ product.url }}" class="link product__view-details animate-arrow">
           {{ 'products.product.view_full_details' | t }}
           {% render 'icon-arrow' %}

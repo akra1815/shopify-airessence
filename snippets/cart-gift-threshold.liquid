@@ -1,0 +1,203 @@
+{%- comment -%}
+  Cart Gift Threshold — Air-Essence
+  Affiche un cadeau “Kit de 5 recharges” offert à partir de 3 sent-bon.
+  Config rapide :
+  - gift_handle : handle du produit cadeau (obligatoire)
+  - threshold_qty : quantité de sent-bon requise
+  - sentbon_product_type : type produit utilisé pour compter (ex: "comptagecart")
+{%- endcomment -%}
+
+{%- assign gift_handle = 'kit-de-5-parfums-pour-recharges' -%}
+{%- assign threshold_qty = 3 -%}
+{%- assign sentbon_product_type = 'comptagecart' -%}
+
+{%- assign gift_product = all_products[gift_handle] -%}
+
+<div class="page-width">
+<div class="gift-threshold-card" id="giftThreshold">
+  <div class="gift-threshold__header">
+    <div class="gift-threshold__media">
+      {%- if gift_product and gift_product.featured_image -%}
+        <img
+          src="{{ gift_product.featured_image | image_url: width: 220 }}"
+          alt="{{ gift_product.title | escape }}"
+          width="110" height="110" loading="lazy">
+      {%- else -%}
+        <!-- fallback si pas d'image -->
+        <div class="gift-threshold__placeholder">🎁</div>
+      {%- endif -%}
+    </div>
+    </div>
+
+    <div class="gift-threshold__meta">
+      <div class="gift-threshold__title">
+        {%- if gift_product -%}
+          {{ gift_product.title }}
+        {%- else -%}
+          Kit de 5 recharges de parfum
+        {%- endif -%}
+      </div>
+
+      <div class="gift-threshold__price">
+        <span class="price--compare">
+          {%- if gift_product -%}
+            {{ gift_product.price | money }}
+          {%- else -%}
+            9,90 €
+          {%- endif -%}
+        </span>
+        <span class="price--free">0,00 €</span>
+      </div>
+
+      <div class="gift-threshold__desc">
+        Prolongez la durée de vie de vos sent-bon jusqu’à 10 semaines supplémentaires !
+      </div>
+    </div>
+  </div>
+
+  <div class="gift-threshold__progress">
+    <div class="gt__progress-top">
+      <span class="gt__progress-text">
+        <span id="gtCount">0</span>/<span id="gtNeed">{{ threshold_qty }}</span>
+      </span>
+      <span class="gt__badge" id="gtBadge">Encore <b>{{ threshold_qty }}</b> pour l’offert</span>
+    </div>
+
+    <div class="gt__bar">
+      <div class="gt__bar-fill" id="gtBarFill" style="width:0%"></div>
+    </div>
+
+    <div class="gt__hint" id="gtHint">
+      Ajoutez <b>{{ threshold_qty }}</b> sent-bon pour obtenir le kit offert.
+    </div>
+  </div>
+</div>
+
+<style>
+
+  .gift-threshold-card{
+    border:1px solid #e5e7eb; border-radius:12px; padding:16px; margin:16px 0;
+    background:#fff; box-shadow:0 2px 10px rgba(0,0,0,.04);
+    font-family:inherit;
+  }
+  .gift-threshold__header{ display:flex; gap:12px; align-items:center; }
+  .gift-threshold__media img{ display:block; border-radius:12px; }
+  .gift-threshold__placeholder{
+    width:110px; height:110px; border-radius:12px; background:#f4f6f5;
+    display:grid; place-items:center; font-size:32px;
+  }
+  .gift-threshold__meta{ display:flex; flex-direction:column; gap:6px; }
+  .gift-threshold__title{ font-weight:600; font-size:16px; line-height:1.2; }
+  .gift-threshold__price{ display:flex; gap:8px; align-items:baseline; }
+  .price--compare{ color:#9ca3af; text-decoration:line-through; }
+  .price--free{ color:#10b981; font-weight:700; }
+  .gift-threshold__desc{ font-size:13px; color:#374151; }
+
+  .gift-threshold__progress{ margin-top:12px; }
+  .gt__progress-top{
+    display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
+  }
+  .gt__progress-text{ font-size:13px; color:#111827; }
+  .gt__badge{
+    background:#f3f4f6; color:#111827; border-radius:999px; padding:4px 10px; font-size:12px;
+  }
+ .gt__bar{
+  position: relative;
+  width: 100%;
+  height: 10px;
+  background: #eef2f7;           /* fond gris OK */
+  border-radius: 999px;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.gt__bar-fill{
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  width: 0;                       /* maj via JS */
+  background: #00b894 !important; /* vert forcé */
+  display: block !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  z-index: 1;
+}
+  .gt__hint{ margin-top:6px; font-size:12px; color:#374151; }
+  .gt--completed .gt__badge{ background:#ecfdf5; color:#065f46; }
+  .gt--completed .gt__hint{ color:#065f46; }
+</style>
+
+<script>
+  (function(){
+    const THRESHOLD = {{ threshold_qty | json }};
+    const TYPE_KEY = {{ sentbon_product_type | json }};
+
+    const $count = document.getElementById('gtCount');
+    const $need  = document.getElementById('gtNeed');
+   const $bar = document.getElementById('gtBarFill')
+           || document.querySelector('.gt__bar-fill')
+           || document.querySelector('.progressBarValue'); // compat ancien nom
+    const $hint  = document.getElementById('gtHint');
+    const $badge = document.getElementById('gtBadge');
+    const $card  = document.getElementById('giftThreshold');
+
+    async function getCart() {
+      try {
+        const r = await fetch('/cart.js', { credentials: 'same-origin' });
+        return await r.json();
+      } catch(e) {
+        console.warn('cart.js error', e);
+        return { items: [] };
+      }
+    }
+
+    function countSentBon(items){
+      // on compte uniquement les produits ayant product_type contenant "comptagecart"
+      return items.reduce((sum, it) => {
+        const pt = (it.product_type || '').toLowerCase();
+        return pt.includes(TYPE_KEY) ? sum + (it.quantity || 0) : sum;
+      }, 0);
+    }
+
+    function updateUI(qty){
+      const capped = Math.min(qty, THRESHOLD);
+      const pct = Math.round((capped / THRESHOLD) * 100);
+
+      $count.textContent = String(qty);
+
+
+if ($bar) {
+  $bar.style.width = pct + '%';
+  $bar.style.background = '#00b894'; // ceinture & bretelles
+}
+      const remain = Math.max(THRESHOLD - qty, 0);
+      if (remain > 0){
+        $badge.innerHTML = 'Encore <b>'+ remain +'</b> pour l’offert';
+        $card.classList.remove('gt--completed');
+        $hint.innerHTML = 'Ajoutez <b>'+ remain +'</b> sent-bon pour obtenir le kit offert.';
+      } else {
+        $badge.innerHTML = '🎉 Cadeau débloqué';
+        $card.classList.add('gt--completed');
+        $hint.innerHTML = 'Le kit de recharges est <b>offert</b> avec votre commande.';
+      }
+    }
+
+    async function refresh(){
+      const cart = await getCart();
+      const qty  = countSentBon(cart.items);
+      updateUI(qty);
+    }
+
+    // Lancement initial
+    document.addEventListener('DOMContentLoaded', refresh);
+    // Quelques triggers utiles sur la page panier (Dawn)
+    document.addEventListener('change', (e)=>{
+      if (e.target && e.target.name && e.target.name.includes('updates')) {
+        // on attend que Shopify mette à jour le panier
+        setTimeout(refresh, 300);
+      }
+    });
+    document.addEventListener('cart:refresh', refresh); // au cas où tu déclenches toi-même cet event
+  })();
+</script>

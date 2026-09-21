@@ -1,0 +1,12 @@
+<a
+  class="ae-review-summary"
+  href="#ae-reviews"
+  data-ae-review-summary
+  data-api-url="{{ settings.ae_reviews_api_url | escape }}"
+  data-product-handle="{{ product.handle | escape }}"
+  aria-label="Voir les avis clients"
+  {{ block.shopify_attributes }}
+>
+  <span class="ae-stars" aria-hidden="true">★★★★★</span>
+  <span class="ae-review-summary__text" data-ae-summary-text>Chargement des avis…</span>
+</a>

@@ -1,0 +1,55 @@
+
+small.tax-note {
+  display: none;
+}
+
+.livraisongratuite
+{
+max-width: 44rem;
+width: 100%;
+}
+
+.sentbonsuppl
+{
+max-width: 44rem;
+width: 100%;
+
+}
+
+.sentbonsuppl2
+{
+max-width: 44rem;
+width: 100%;
+
+}
+
+.kggarantielivraison
+{
+max-width: 44rem;
+width: 100%;
+
+}
+
+.textsoldekg
+{
+  text-align: center;
+  line-height: 1.4;
+}
+
+#checkout
+{
+  text-transform: uppercase;
+  font-family: Poppins, sans-serif;
+font-weight: 600;
+}
+
+.cart__note
+{
+  height: 50px !important;
+}
+
+.cart__note .text-area
+{
+  height: 50px !important;
+  min-height: 50px !important;
+}

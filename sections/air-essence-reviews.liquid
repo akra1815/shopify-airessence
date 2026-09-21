@@ -1,0 +1,148 @@
+<section
+  id="ae-reviews"
+  class="ae-reviews page-width section-{{ section.id }}-padding"
+  data-ae-reviews
+  data-api-url="{{ settings.ae_reviews_api_url | escape }}"
+  data-product-id="{{ product.id }}"
+  data-product-handle="{{ product.handle | escape }}"
+  data-product-title="{{ product.title | escape }}"
+  data-per-page="{{ section.settings.reviews_per_page }}"
+>
+  <header class="ae-reviews__header">
+    <div>
+      <p class="ae-reviews__eyebrow">Avis clients</p>
+      <h2 class="ae-reviews__title {{ section.settings.heading_size }}">{{ section.settings.heading | escape }}</h2>
+    </div>
+    <button class="button button--primary ae-write-button" type="button" data-ae-open-form>
+      Écrire un avis
+    </button>
+  </header>
+
+  <div class="ae-reviews__loading" data-ae-loading>Chargement des avis…</div>
+  <div class="ae-reviews__error" data-ae-error hidden></div>
+
+  <div class="ae-reviews__content" data-ae-content hidden>
+    <div class="ae-overview">
+      <div class="ae-overview__score">
+        <strong data-ae-average>—</strong><span>/5</span>
+        <div class="ae-stars" aria-hidden="true">★★★★★</div>
+        <p><span data-ae-count>0</span> avis</p>
+      </div>
+      <div class="ae-overview__bars" data-ae-bars></div>
+    </div>
+
+    <div class="ae-photo-strip" data-ae-photo-strip hidden>
+      <h3>Vos créations en images</h3>
+      <div class="ae-photo-strip__grid" data-ae-photo-grid></div>
+    </div>
+
+    <div class="ae-toolbar" aria-label="Filtres des avis">
+      <div class="ae-filter-buttons">
+        <button type="button" class="ae-filter is-active" data-rating="">Tous</button>
+        <button type="button" class="ae-filter" data-photos="true">Avec photos</button>
+        <button type="button" class="ae-filter" data-rating="5">5 étoiles</button>
+        <button type="button" class="ae-filter" data-rating="4">4 étoiles</button>
+        <button type="button" class="ae-filter" data-rating="3">3 étoiles</button>
+        <button type="button" class="ae-filter" data-rating="2">2 étoiles</button>
+        <button type="button" class="ae-filter" data-rating="1">1 étoile</button>
+      </div>
+      <label class="ae-sort">
+        <span class="visually-hidden">Trier les avis</span>
+        <select data-ae-sort>
+          <option value="recent">Les plus récents</option>
+          <option value="helpful">Les plus pertinents</option>
+          <option value="highest">Note la plus élevée</option>
+          <option value="lowest">Note la plus basse</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="ae-review-list" data-ae-list></div>
+    <button class="button button--secondary ae-load-more" type="button" data-ae-load-more hidden>
+      Voir plus d’avis
+    </button>
+  </div>
+
+  <dialog class="ae-dialog" data-ae-form-dialog aria-labelledby="ae-form-title-{{ section.id }}">
+    <form class="ae-review-form" data-ae-form enctype="multipart/form-data">
+      <button class="ae-dialog__close" type="button" data-ae-close aria-label="Fermer">×</button>
+      <h2 id="ae-form-title-{{ section.id }}">Donnez votre avis</h2>
+      <p class="ae-form-intro">Votre expérience aide les autres clients à faire leur choix.</p>
+
+      <fieldset class="ae-rating-fieldset">
+        <legend>Votre note</legend>
+        <div class="ae-rating-input" data-ae-rating-input>
+          {% for star in (1..5) reversed %}
+            <input id="ae-star-{{ section.id }}-{{ star }}" type="radio" name="rating" value="{{ star }}" required>
+            <label for="ae-star-{{ section.id }}-{{ star }}" aria-label="{{ star }} étoile{% if star > 1 %}s{% endif %}">★</label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <label>Votre prénom et l’initiale de votre nom
+        <input type="text" name="nickname" maxlength="80" autocomplete="name" required placeholder="Ex. Marie D.">
+      </label>
+      <label>Votre e-mail <span>(non affiché)</span>
+        <input type="email" name="email" maxlength="254" autocomplete="email" required>
+      </label>
+      <label>Titre <span>(facultatif)</span>
+        <input type="text" name="title" maxlength="120" placeholder="Résumez votre expérience">
+      </label>
+      <label>Votre avis
+        <textarea name="review" rows="5" maxlength="3000" required></textarea>
+      </label>
+      <label>Ajouter des photos <span>(jusqu’à 4 fichiers JPG, PNG ou WebP)</span>
+        <input type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple>
+      </label>
+
+      <input type="text" name="website" class="ae-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <p class="ae-form-status" data-ae-form-status aria-live="polite"></p>
+      <button class="button button--primary" type="submit" data-ae-submit>Envoyer mon avis</button>
+      <p class="ae-form-notice">Les avis sont contrôlés avant publication. Votre e-mail ne sera jamais affiché.</p>
+    </form>
+  </dialog>
+
+  <dialog class="ae-dialog ae-photo-dialog" data-ae-photo-dialog>
+    <button class="ae-dialog__close" type="button" data-ae-photo-close aria-label="Fermer">×</button>
+    <img data-ae-photo-large alt="Photo transmise par un client" width="1200" height="1200" loading="lazy">
+  </dialog>
+</section>
+
+{% style %}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Avis Air Essence",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Titre", "default": "Ce que nos clients en pensent" },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Taille du titre",
+      "options": [
+        { "value": "h2", "label": "Petite" },
+        { "value": "h1", "label": "Moyenne" },
+        { "value": "h0", "label": "Grande" }
+      ],
+      "default": "h1"
+    },
+    { "type": "range", "id": "reviews_per_page", "min": 5, "max": 30, "step": 5, "label": "Avis chargés à la fois", "default": 10 },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "Marge supérieure", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "Marge inférieure", "default": 64 }
+  ],
+  "presets": [{ "name": "Avis Air Essence" }]
+}
+{% endschema %}

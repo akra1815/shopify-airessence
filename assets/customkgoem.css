@@ -1,0 +1,41 @@
+.product__title h1 
+{
+  font-family: Poppins, sans-serif;
+  color: #00B894;
+  font-weight: 500;
+  font-size: calc(var(--font-heading-scale) * 2.4rem);
+
+}
+
+.product__title
+{
+    margin-bottom: 0;
+}
+
+.no-js-hidden
+{
+  margin-top: 0;
+}
+
+.product__tax
+{
+  display: none !important;
+}
+
+select.select__select
+{
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+
+}
+label.form__label
+{
+  font-size: 16px;
+  color: #00B894;
+ font-weight: 600;
+}
+
+.product-form__buttons
+{
+  margin-top: 40px;
+}

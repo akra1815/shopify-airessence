@@ -1,0 +1,352 @@
+{{ 'component-cart.css' | asset_url | stylesheet_tag }}
+{{ 'component-totals.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+{{ 'customkgcart.css' | asset_url | stylesheet_tag }}
+
+
+
+<script>
+
+/*
+function kgfunction()  { 
+  
+
+var subtotalprice = document.querySelector(".totals__subtotal-value").innerHTML;
+var subtotal2 = subtotalprice.replace("€", "");
+var subtotal3 = subtotal2.replace(" EUR", "");
+var subtotal4 = subtotal3.replace(",", ".");
+var subtotal5 = 0 - subtotal4;
+var solde = (Math.round(subtotal5 * 100) / 100).toFixed(2);
+
+var text = document.createElement("p");
+text.setAttribute ("class", "textsoldekg")
+text.innerHTML = "Plus que <b>" + solde + "€</b> pour bénéficier de la livraison gratuite ! 📦";
+
+var parentdivtotals = document.querySelector("div.totals").parentElement;
+parentdivtotals.appendChild(text);
+  
+var livraisongratuite = document.createElement("img");
+var formaddsuppl = document.querySelector(".formsentbonsuppl")
+var boutonaddsuppl = document.querySelector(".sentbonsuppl")
+var formaddsuppl2 = document.querySelector(".formsentbonsuppl2")
+var boutonaddsuppl2 = document.querySelector(".sentbonsuppl2")
+  
+
+if (solde <= 0) {
+  //livraisongratuite.setAttribute("src", "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/livraison_gratuite_259b5969-b1a2-443d-82ff-01231354fe32.jpg?v=1686058125");
+  livraisongratuite.setAttribute("class", "livraisongratuite");
+  parentdivtotals.appendChild(livraisongratuite);
+  text.style.display="none";
+  formaddsuppl.style.display="none";
+  formaddsuppl2.style.display="none";
+}
+else if (solde <= 5.90) {
+  livraisongratuite.style.display="none";
+  parentdivtotals.appendChild(formaddsuppl);
+  formaddsuppl2.style.display="none";
+}
+else if (solde <= 11.80) {
+  livraisongratuite.style.display="none";
+  parentdivtotals.appendChild(formaddsuppl);
+  parentdivtotals.appendChild(formaddsuppl2);
+}
+else
+{
+  formaddsuppl.style.display="none";
+  formaddsuppl2.style.display="none";
+  text.style.display="none";
+}
+
+  
+  
+}
+*/
+ 
+</script>
+
+
+
+
+
+
+
+
+
+<div class="page-width{% if cart == empty %} is-empty{% endif %}" id="main-cart-footer" data-id="{{ section.id }}">
+  <div>
+    <div class="cart__footer">
+      {%- if settings.show_cart_note -%}
+        <cart-note class="cart__note field">
+          <label for="Cart-note">{{ 'sections.cart.note' | t }}</label>
+          <textarea
+            class="text-area field__input"
+            name="note"
+            form="cart"
+            id="Cart-note"
+            placeholder="{{ 'sections.cart.note' | t }}"
+          >{{ cart.note }}</textarea>
+        </cart-note>
+      {%- endif -%}
+
+      
+      <div class="cart__blocks">
+        {% for block in section.blocks %}
+          {%- case block.type -%}
+            {%- when '@app' -%}
+              {% render block %}
+            {%- when 'subtotal' -%}
+              <div class="js-contents" {{ block.shopify_attributes }}>
+               
+                <div class="totals" style ="margin-bottom: 25px;">
+                  <h2 class="totals__subtotal">{{ 'sections.cart.subtotal' | t }}</h2>
+                  <p class="totals__subtotal-value">{{ cart.total_price | money_with_currency }}</p>
+                </div>
+
+
+
+
+                
+                
+{% assign isAssurance = true %}
+
+{% for item in cart.items %}
+   {% if item.product.tags contains 'insdel' %}
+      {% assign isAssurance = false %}
+   {% endif %}
+{% endfor %}
+
+{% if isAssurance  %}
+
+                <!-- Bouton assurance de livraison
+
+<form method="post" action="/cart/add" class="kggarantielivraisonform">
+  <input name="id" value="47617822032174" type="hidden" />
+  <input name="add" value="ORDER NOW" type="image" src="https://cdn.shopify.com/s/files/1/0769/3831/4030/files/bouton_upsell_garantie_livraison_465e9d59-bda0-46c9-8b0b-090da6661ce5.jpg?v=1701947292" class="kggarantielivraison" />
+</form>
+              -->
+
+                
+                
+{% endif %}
+
+
+
+                
+
+{% assign isGift = true %}
+
+{% for item in cart.items %}
+   {% if item.product.tags contains 'kggift' %}
+      {% assign isGift = false %}
+   {% endif %}
+{% endfor %}
+
+{% if isGift  %}
+
+                
+<!--
+<form method="post" action="/cart/add" class="kggarantielivraisonform">
+  <input name="id" value="47632229105966" type="hidden" />
+  <input name="add" value="ORDER NOW" type="image" src="https://cdn.shopify.com/s/files/1/0769/3831/4030/files/bouton_upsell_petit_sac_cadeau_de10b378-34ee-42ef-b0e7-921767725caa.jpg?v=1702046808" class="kggarantielivraison" />
+</form>
+         -->     
+                
+{% endif %}
+
+
+
+
+
+
+                
+
+                
+
+{% assign isCadre = true %}
+
+{% for item in cart.items %}
+   {% if item.product.tags contains 'kgcadre' %}
+      {% assign isCadre = false %}
+   {% endif %}
+{% endfor %}
+
+{% if isCadre  %}
+
+          <!--      
+
+<form method="post" action="/cart/add" class="kggarantielivraisonform">
+  <a href="https://air-essence.com/products/cadre-photo-personnalise">
+<img src="https://cdn.shopify.com/s/files/1/0769/3831/4030/files/bouton_upsell_cadre_photo_005a486e-5930-4c1f-a3d0-0ad8a2e9f080.jpg?v=1714872497" width="100%">
+  </a>
+</form>
+         -->  
+                
+{% endif %}
+
+
+
+
+                
+
+
+
+
+                
+
+
+{% assign isParf = true %}
+
+{% for item in cart.items %}
+   {% if item.product.tags contains 'kgparf' %}
+      {% assign isParf = false %}
+   {% endif %}
+{% endfor %}
+
+{% if isParf  %}
+
+                
+
+<form method="post" action="/cart/add" class="kggarantielivraisonform">
+  <input name="id" value="48674297905454" type="hidden" />
+  <input name="add" value="ORDER NOW" type="image" src="https://cdn.shopify.com/s/files/1/0769/3831/4030/files/bouton_upsell_kit_parfums_06895efd-3af9-46f2-a70b-222771c54eb5.jpg?v=1714577412" class="kggarantielivraison" />
+</form>
+        
+                
+{% endif %}
+                
+
+
+
+
+
+                
+                
+                
+                
+                
+<!--
+<form method="post" action="/cart/add" class="formsentbonsuppl">
+  <input name="id" value="45456313549102" type="hidden" />
+  <input name="add" value="ORDER NOW" type="image" src="https://cdn.shopify.com/s/files/1/0769/3831/4030/files/sent-bon_suppl_a2d3a05c-b069-4e07-9802-4adbc0b4d435.jpg?v=1686064373" class="sentbonsuppl" />
+</form>
+
+<form method="post" action="/cart/add" class="formsentbonsuppl2">
+  <input name="id" value="45456313581870" type="hidden" />
+  <input name="add" value="ORDER NOW" type="image" src="https://cdn.shopify.com/s/files/1/0769/3831/4030/files/2x_sent-bon_suppl.jpg?v=1686064661" class="sentbonsuppl2" />
+</form>
+-->
+                
+                
+                <div>
+                  {%- if cart.cart_level_discount_applications.size > 0 -%}
+                    <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                      {%- for discount in cart.cart_level_discount_applications -%}
+                        <li class="discounts__discount discounts__discount--position">
+                          {%- render 'icon-discount' -%}
+                          {{ discount.title }}
+                          (-{{ discount.total_allocated_amount | money }})
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </div>
+
+                      <div class="order-value-booster-block" id="clpdqh502109979318udecl61eri"></div>
+
+                <small class="tax-note caption-large rte">
+                  {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
+                    {{ 'sections.cart.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                  {%- elsif cart.taxes_included -%}
+                    {{ 'sections.cart.taxes_included_but_shipping_at_checkout' | t }}
+                  {%- elsif shop.shipping_policy.body != blank -%}
+                    {{ 'sections.cart.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url }}
+                  {%- else -%}
+                    {{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}
+                  {%- endif -%}
+                </small>
+              </div>
+            {%- else -%}
+              <div style ="margin-top: 20px;" class="cart__ctas" {{ block.shopify_attributes }}>
+                <noscript>
+                  <button type="submit" class="cart__update-button button button--secondary" form="cart">
+                    {{ 'sections.cart.update' | t }}
+                  </button>
+                </noscript>
+
+                <button
+                  type="submit"
+                  id="checkout"
+                  class="cart__checkout-button button"
+                  name="checkout"
+                  {% if cart == empty %}
+                    disabled
+                  {% endif %}
+                  form="cart"
+                >
+                  {{ 'sections.cart.checkout' | t }}
+                </button>
+              </div>
+
+              {%- if additional_checkout_buttons -%}
+                <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
+                  {{ content_for_additional_checkout_buttons }}
+                </div>
+              {%- endif -%}
+          {%- endcase -%}
+        {% endfor %}
+
+
+
+        <div id="cart-errors"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    //kgfunction();
+    function isIE() {
+      const ua = window.navigator.userAgent;
+      const msie = ua.indexOf('MSIE ');
+      const trident = ua.indexOf('Trident/');
+
+      return msie > 0 || trident > 0;
+      
+    }
+
+    if (!isIE()) return;
+    const cartSubmitInput = document.createElement('input');
+    cartSubmitInput.setAttribute('name', 'checkout');
+    cartSubmitInput.setAttribute('type', 'hidden');
+    document.querySelector('#cart').appendChild(cartSubmitInput);
+    document.querySelector('#checkout').addEventListener('click', function (event) {
+      document.querySelector('#cart').submit();
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.main-cart-footer.name",
+  "class": "cart__footer-wrapper",
+  "blocks": [
+    {
+      "type": "subtotal",
+      "name": "t:sections.main-cart-footer.blocks.subtotal.name",
+      "limit": 1
+    },
+    {
+      "type": "buttons",
+      "name": "t:sections.main-cart-footer.blocks.buttons.name",
+      "limit": 1
+    },
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}

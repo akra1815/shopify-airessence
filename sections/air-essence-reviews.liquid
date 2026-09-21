@@ -1,11 +1,18 @@
+{% liquid
+  assign review_product = product
+  if review_product == blank
+    assign review_product = section.settings.product
+  endif
+%}
+
 <section
   id="ae-reviews"
   class="ae-reviews page-width section-{{ section.id }}-padding"
   data-ae-reviews
   data-api-url="{{ settings.ae_reviews_api_url | escape }}"
-  data-product-id="{{ product.id }}"
-  data-product-handle="{{ product.handle | escape }}"
-  data-product-title="{{ product.title | escape }}"
+  data-product-id="{{ review_product.id }}"
+  data-product-handle="{{ review_product.handle | escape }}"
+  data-product-title="{{ review_product.title | escape }}"
   data-per-page="{{ section.settings.reviews_per_page }}"
 >
   <header class="ae-reviews__header">
@@ -13,9 +20,11 @@
       <p class="ae-reviews__eyebrow">Avis clients</p>
       <h2 class="ae-reviews__title {{ section.settings.heading_size }}">{{ section.settings.heading | escape }}</h2>
     </div>
-    <button class="button button--primary ae-write-button" type="button" data-ae-open-form>
-      Écrire un avis
-    </button>
+    {% if section.settings.show_write_button %}
+      <button class="button button--primary ae-write-button" type="button" data-ae-open-form>
+        Écrire un avis
+      </button>
+    {% endif %}
   </header>
 
   <div class="ae-reviews__loading" data-ae-loading>Chargement des avis…</div>
@@ -127,7 +136,9 @@
   "tag": "section",
   "class": "section",
   "settings": [
+    { "type": "product", "id": "product", "label": "Produit (hors fiche produit)" },
     { "type": "text", "id": "heading", "label": "Titre", "default": "Ce que nos clients en pensent" },
+    { "type": "checkbox", "id": "show_write_button", "label": "Afficher le bouton Écrire un avis", "default": true },
     {
       "type": "select",
       "id": "heading_size",

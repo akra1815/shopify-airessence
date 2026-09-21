@@ -1,515 +1,228 @@
-//------------ changement du titre en h2 au lieu de h1
+(() => {
+  'use strict';
 
-var title = document.querySelector("div.product__title h1");
-var titletext = title.innerHTML;
-var divtitle = document.querySelector("div.product__title");
-var titleh2 = document.createElement("h2");
-titleh2.classList.add("titlekg")
-titleh2.innerHTML = titletext;
-divtitle.appendChild(titleh2);
-title.style.display = "none";
+  const root = document.querySelector('[data-ae-personalized-product]');
+  if (!root || root.dataset.aeEnhanced === 'true') return;
+  root.dataset.aeEnhanced = 'true';
 
-/*
-//Ajout du "à partir de" dans le prix
-var pricekgspan = document.querySelector("span.price-item--last");
-var pricekg = pricekgspan.innerHTML;
-var ajoutpricekg = "<span style = 'font-size: 15px;'>à partir de </span>";
-pricekgspan.innerHTML = ajoutpricekg + pricekg;
-*/
+  const money = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+  const qs = (selector, scope = root) => scope.querySelector(selector);
+  const qsa = (selector, scope = root) => [...scope.querySelectorAll(selector)];
+  const waitFor = (selector, timeout = 12000) => new Promise((resolve) => {
+    const existing = qs(selector);
+    if (existing) return resolve(existing);
+    const observer = new MutationObserver(() => {
+      const element = qs(selector);
+      if (!element) return;
+      observer.disconnect();
+      resolve(element);
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    window.setTimeout(() => { observer.disconnect(); resolve(null); }, timeout);
+  });
 
-/*
+  const setStep = (step, complete, active = false) => {
+    const item = qs(`[data-ae-progress-step="${step}"]`);
+    if (!item) return;
+    item.classList.toggle('is-complete', complete);
+    item.classList.toggle('is-active', active);
+  };
 
-//Ajout de la mini description au sommet de la page produit
-var positionminidesc = document.querySelector("div.price--show-badge");
-var minidescdiv = document.createElement("div");
-var minidesctitre = document.createElement("span");
-var minidesc = document.createElement("p");
-minidesctitre.classList.add("minidesctitre");
-minidesctitre.innerHTML = "Crée une ambiance unique dans ta voiture !";
-minidesc.classList.add("minidesc");
-minidesc.innerHTML = "&emsp;<b style='color: #00B894; font-size :18px;'>•</b> Parfums Premium - durée de vie 1 mois<br>&emsp;<b style='color: #00B894; font-size :18px;'>•</b> 100% personnalisable avec ton image<br>&emsp;<b style='color: #00B894; font-size :18px;'>•</b> Idée cadeau originale pour toute occasion<br>";
-positionminidesc.appendChild(minidesctitre);
-positionminidesc.appendChild(minidesc);
+  const closestField = (element) => element?.closest('.pplr-wrapper, .pplr-field, .pplr-customization, .pplr-option') || element?.parentElement;
 
-*/
-
-
-
-//fonction qui change le texte du titre de la forme
-function changetexteforme(forme) {
-var formetitletext = document.querySelector("div.formetitle");
-formetitletext.innerHTML = "Étape 2 - Forme : " + forme;
-}
-
-
-//fonction qui déplace la dropdown parfum en dessous du bouton ajouter recharge
-function dropdownrecharge() {
-var divdropdownrecharge = document.querySelector(".pplr-parfum-recharge");
-var srcrecharge = document.getElementById("inputrecharge").parentElement;
-var texterecharge = document.querySelector(".rechargetext");
-srcrecharge.appendChild(divdropdownrecharge);
-srcrecharge.appendChild(texterecharge);
-}
-
-
-function modifaddimage() {
-  /*
-var inputrefaddimage = document.querySelectorAll("input[data_name='_<div class=imageadded>Upload Image supplémentaire<div>']");
-
-var inputrefaddimageclass0 = inputrefaddimage[0].parentElement.getAttribute("class");
-inputrefaddimage[0].parentElement.setAttribute("class", inputrefaddimageclass0 + " divaddimageupload");
-  
-var inputrefaddimageclass2 = inputrefaddimage[2].parentElement.getAttribute("class");
-inputrefaddimage[2].parentElement.setAttribute("class", inputrefaddimageclass2 + " divaddimageupload");
-
-var inputrefaddimageclass4 = inputrefaddimage[4].parentElement.getAttribute("class");
-inputrefaddimage[4].parentElement.setAttribute("class", inputrefaddimageclass4 + " divaddimageupload");
-
-var inputrefaddimageclass6 = inputrefaddimage[6].parentElement.getAttribute("class");
-inputrefaddimage[6].parentElement.setAttribute("class", inputrefaddimageclass6 + " divaddimageupload");
-
-
-
-var divspanaddimage = document.querySelectorAll(".divaddimageupload");
-  
-var spanaddimage0 = divspanaddimage[0].getElementsByTagName('span');
-var spanaddimage1 = divspanaddimage[1].getElementsByTagName('span');
-var spanaddimage2 = divspanaddimage[2].getElementsByTagName('span');
-var spanaddimage3 = divspanaddimage[3].getElementsByTagName('span');
-  console.log(spanaddimage0);
-var spanaddimageclass0 = spanaddimage0[0].getAttribute("class");
-var spanaddimageclass1 = spanaddimage1[0].getAttribute("class");
-var spanaddimageclass2 = spanaddimage2[0].getAttribute("class");
-var spanaddimageclass3 = spanaddimage3[0].getAttribute("class");
-  
-spanaddimage0[0].setAttribute("class", spanaddimageclass0 + " spanaddimage");
-spanaddimage1[0].setAttribute("class", spanaddimageclass1 + " spanaddimage");
-spanaddimage2[0].setAttribute("class", spanaddimageclass2 + " spanaddimage");
-spanaddimage3[0].setAttribute("class", spanaddimageclass3 + " spanaddimage");
-  */
-/*
-var divregroup = document.createElement("div");
-divregroup.setAttribute("id", "divregroup");
-divregroup.appendChild(spanaddimage0[0].parentElement);
-divregroup.appendChild(spanaddimage1[0].parentElement);
-divregroup.appendChild(spanaddimage2[0].parentElement);
-divregroup.appendChild(spanaddimage3[0].parentElement);
-
-var textinfoimage = document.querySelector(".addimagetext");
-var parentdivaddimage = document.querySelector("div.addimage").parentElement;
-parentdivaddimage.appendChild(divregroup);
-parentdivaddimage.appendChild(textinfoimage);
-*/
-
-
-}
-
-//fonction qui change le texte descriptif du parfum
-function changetexteparfum() {
-var descriptionparfum = document.querySelector("p.parfumtext");
-var selecteurparfum = document.querySelector("select.pplr_select");
-
-/*
-  
-if (selecteurparfum.value == "Bois de oud") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Boisé, ambré <b>• Ambiance</b> : Luxe, oriental";
-} 
-else if (selecteurparfum.value == "Cèdre du Liban") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Boisé, fruité <b>• Ambiance</b> : Vanillé, oriental";
-}
-else if (selecteurparfum.value == "Vanille") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Floral, musqué <b>• Ambiance</b> : Vanillé, relaxant";
-}
-else if (selecteurparfum.value == "Fruits des bois") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Floral, musqué <b>• Ambiance</b> : Fruité, miellé";
-}
-else if (selecteurparfum.value == "Fleur de cerisier") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Floral, fruité <b>• Ambiance</b> : Printemps, frais";
-}
-else if (selecteurparfum.value == "Fleur des îles") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Floral, musqué <b>• Ambiance</b> : Estival, vanillé";
-}
-else if (selecteurparfum.value == "Fruit de la passion") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Fruité, passion <b>• Ambiance</b> : Tropical, gourmand";
-}
-else if (selecteurparfum.value == "Mojito") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Menthe, citron <b>• Ambiance</b> : Estival, frais";
-}
-else if (selecteurparfum.value == "Nuit d'orient") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Boisé, épicé <b>• Ambiance</b> : Vanillé, oriental";
-}
-else if (selecteurparfum.value == "Pastèque-melon") {
-descriptionparfum.innerHTML = "<b>• Notes</b> : Fruité <b>• Ambiance</b> : Estival, gourmand";
-}
-else {
-  descriptionparfum.innerHTML = "";
-}
-
-  */
-  
-}
-
-
-
-/*
-var titleparf = document.querySelector('h2.parfum');
-var subtitlesparf = document.querySelector('p.subtitles.parfum');
-var divdestparfum = document.querySelector('div.kgdesttxtparfum');
-divdestparfum.appendChild(titleparf);
-divdestparfum.appendChild(subtitlesparf);
-
-*/
-  
-
-window.onload=function()  { 
-
-  var listprice = document.querySelector('div.listprice');
-
-var divContainer = document.createElement('div');
-  console.log(divContainer);
-  divContainer.className = 'quantite-container';
-  var selector = document.querySelector('.quantity');
- divContainer.appendChild(selector);
-var divsource = document.querySelector('div.product-form__quantity');
-    console.log(divsource);
-var progressbarkg = document.querySelector('.progress-container');
-var kgeco = document.querySelector('.kgeco');
-  divsource.appendChild(divContainer);
-    divsource.appendChild(kgeco);
-  divsource.appendChild(progressbarkg);
-  var paraquant = document.createElement('p');
-  paraquant.className = 'paraquant';
-  paraquant.innerHTML ="";
-  divContainer.appendChild(paraquant);
-  var inputselector = document.querySelector('input.quantity__input');
-  var inputval = 0;
-  var qtycart = 0;
-  var inputvalcart = 0;
-
-var btnaddtocart = document.querySelector('div.product-form__buttons button span');
-var btnaddtocarthtml = btnaddtocart.innerHTML;
-  
-function isFreshener(item) {
-  return item.product_type && item.product_type.toLowerCase().includes('comptagecart');
-}
-
-async function getCartQtyComptage() {
-  try {
-    const response = await fetch('/cart.js', { credentials: 'same-origin' });
-    const cart = await response.json();
-    return cart.items.reduce((sum, item) => {
-      return isFreshener(item) ? sum + item.quantity : sum;
-    }, 0);
-  } catch (e) {
-    console.warn('Erreur lors du comptage panier:', e);
-    return 0;
-  }
-}
-  
-async function updateContent() {
-  var qtycart = await getCartQtyComptage();
-  var inputval = parseInt(inputselector.value, 10) || 0;
-  var inputvalcart = inputval + qtycart;
-  var kgecotxt = document.querySelector('.kgecotxt');
-  var savingsMessage = '';
-if (inputvalcart <= 1) {
-    paraquant.innerHTML = inputselector.value + ' sent-bon (9.90€ / p)';
-    btnaddtocart.innerHTML = btnaddtocarthtml + ' - ' + (inputval * 9.90).toFixed(2) + '€';
-    kgecotxt.innerHTML = '<strong class="strongparaquant">Ajoutez des sent-bon pour obtenir des réductions !</strong><br>Aussi cumulable avec vos autres créations.<br>(revenir sur cette page après)';  
-  } else if (inputvalcart >= 2 && inputvalcart <= 2) {
-    var savings = (inputvalcart * 1.00).toFixed(2);  // Formater l'économie avec deux décimales
-    savingsMessage = '<strong class="strongparaquantbis">Ajoutez encore <strong class="strongparaquant">1 sent-bon</strong> pour obtenir <strong class="strongparaquant">-20%</strong> !</strong><br>La prochaine pièce ne vous coûtera que 5.90€';
-    //paraquant.innerHTML = inputselector.value + ' sent-bon (8.90€ / p)<br>' + savingsMessage;
-    paraquant.innerHTML = inputselector.value + ' sent-bon (8.90€ / p)';
-    kgecotxt.innerHTML = savingsMessage;
-    btnaddtocart.innerHTML = btnaddtocarthtml + ' - ' + (inputval * 8.90).toFixed(2) + '€';
-  } else if (inputvalcart >= 3 && inputvalcart <= 3) {
-    var savings = (inputvalcart * 2.00).toFixed(2);
-    savingsMessage = '<strong class="strongparaquantbis">Ajoutez encore <strong class="strongparaquant">1 sent-bon</strong> pour obtenir <strong class="strongparaquant">-30%</strong> !</strong><br>La prochaine pièce ne vous coûtera que 3.90€';
-    //paraquant.innerHTML = inputselector.value + ' sent-bon (7.90€ / p)<br>' + savingsMessage;
-    paraquant.innerHTML = inputselector.value + ' sent-bon (7.90€ / p)';
-    kgecotxt.innerHTML = savingsMessage;
-    btnaddtocart.innerHTML = btnaddtocarthtml + ' - ' + (inputval * 7.90).toFixed(2) + '€';
-  } else if (inputvalcart >= 4 && inputvalcart <= 4) {
-    var savings = (inputvalcart * 3.00).toFixed(2);
-   savingsMessage = '<strong class="strongparaquantbis">Ajoutez encore <strong class="strongparaquant">1 sent-bon</strong> pour obtenir <strong class="strongparaquant">-40%</strong> !</strong><br>La prochaine pièce ne vous coûtera que 1.90€';
-    //paraquant.innerHTML = inputselector.value + ' sent-bon (6.90€ / p)<br>' + savingsMessage;
-    paraquant.innerHTML = inputselector.value + ' sent-bon (6.90€ / p)'
-    kgecotxt.innerHTML = savingsMessage;
-    btnaddtocart.innerHTML = btnaddtocarthtml + ' - ' + (inputval * 6.90).toFixed(2) + '€';
-  } else if (inputvalcart >= 5) {
-    var savings = (inputvalcart * 4.00).toFixed(2);
-    savingsMessage = 'Vous économisez actuellement <strong class="strongparaquant">' + savings + '€</strong>';
-    //paraquant.innerHTML = inputselector.value + ' sent-bon (5.90€ / p)<br>' + savingsMessage;
-    paraquant.innerHTML = inputselector.value + ' sent-bon (5.90€ / p)';
-    kgecotxt.innerHTML = savingsMessage;
-    btnaddtocart.innerHTML = btnaddtocarthtml + ' - ' + (inputval * 5.90).toFixed(2) + '€';
+  function addStepHeading(element, step, title, help = '') {
+    const field = closestField(element);
+    if (!field || field.querySelector(`.ae-step-heading[data-step="${step}"]`)) return;
+    field.classList.add('ae-config-field');
+    field.dataset.aeStep = String(step);
+    const heading = document.createElement('div');
+    heading.className = 'ae-step-heading';
+    heading.dataset.step = String(step);
+    heading.innerHTML = `<span>${step}</span><div><strong>${title}</strong>${help ? `<small>${help}</small>` : ''}</div>`;
+    field.prepend(heading);
   }
 
-}
-
-selector.addEventListener('change', updateContent);
-updateContent();
-
-
-   divsource.insertBefore(listprice, divsource.firstChild);
-
-  
-  if(titletext.includes("Teams"))
-  {} else {
-var txtqtykg = document.querySelector("label.quantity__label").innerHTML;
-document.querySelector("label.quantity__label").innerHTML = "Étape 4 -" + txtqtykg;
-
-
-var qtykg = document.querySelector("div.product-form__quantity");
-
-var formkg = document.querySelector("div.pplr-dropdown");
-formkg.appendChild(qtykg);
+  async function getCartQuantity() {
+    try {
+      const response = await fetch('/cart.js', { credentials: 'same-origin' });
+      if (!response.ok) return 0;
+      const cart = await response.json();
+      return cart.items.reduce((total, item) => {
+        const type = String(item.product_type || '').toLowerCase();
+        return type.includes('comptagecart') ? total + Number(item.quantity || 0) : total;
+      }, 0);
+    } catch (_) { return 0; }
   }
 
-var titreajoutimage = document.querySelector(".imagetitle").parentElement;
-titreajoutimage.setAttribute("id", "titreajoutimage");
+  function tierFor(quantity) {
+    if (quantity >= 5) return { unit: 5.9, next: 0 };
+    if (quantity === 4) return { unit: 6.9, next: 5 };
+    if (quantity === 3) return { unit: 7.9, next: 4 };
+    if (quantity === 2) return { unit: 8.9, next: 3 };
+    return { unit: 9.9, next: 2 };
+  }
 
-//on capture les 4 formes et on récupère leur fonction onclick
-var formes = document.querySelectorAll("div.pplr_thumb_image span.pplr-swatch-element");
-//on récupère le nom de la forme et on ajoute la fonction pour changer le nom du titre (Choisis ta forme : + Forme) dans le onclick
-//Forme 0 :
-var onclickbase0 = formes[0].getAttribute("onclick");
-var texteforme0 = formes[0].querySelector("span.img_dropdown").innerHTML;
-var onclickmodif0 = onclickbase0 + "changetexteforme('" + texteforme0 + "');";
-formes[0].setAttribute('onclick', onclickmodif0);
-//Forme 1 :
-var onclickbase1 = formes[1].getAttribute("onclick");
-var texteforme1 = formes[1].querySelector("span.img_dropdown").innerHTML;
-var onclickmodif1 = onclickbase1 + "changetexteforme('" + texteforme1 + "');";
-formes[1].setAttribute('onclick', onclickmodif1);
-//Forme 2 :
-var onclickbase2 = formes[2].getAttribute("onclick");
-var texteforme2 = formes[2].querySelector("span.img_dropdown").innerHTML;
-var onclickmodif2 = onclickbase2 + "changetexteforme('" + texteforme2 + "');";
-formes[2].setAttribute('onclick', onclickmodif2);
-//Forme 3 :
-var onclickbase3 = formes[3].getAttribute("onclick");
-var texteforme3 = formes[3].querySelector("span.img_dropdown").innerHTML;
-var onclickmodif3 = onclickbase3 + "changetexteforme('" + texteforme3 + "');";
-formes[3].setAttribute('onclick', onclickmodif3);
-  
+  function installStickyButton(realButton) {
+    if (document.querySelector('.ae-sticky-buy')) return;
+    const sticky = document.createElement('div');
+    sticky.className = 'ae-sticky-buy';
+    sticky.innerHTML = '<div><small>Total</small><strong data-ae-sticky-total></strong></div><button type="button">Ajouter mon sent-bon</button>';
+    qs('button', sticky).addEventListener('click', () => realButton.click());
+    document.body.append(sticky);
+    const observer = new IntersectionObserver(([entry]) => sticky.classList.toggle('is-visible', !entry.isIntersecting), { threshold: 0.15 });
+    observer.observe(realButton);
+  }
 
-var formeselected = document.querySelector("div.pplr_thumb_image span.selected");
-var texteformeselected = formeselected.querySelector("span.img_dropdown").innerHTML;
-changetexteforme(texteformeselected);
-  
+  async function enhanceQuantity() {
+    const quantityInput = await waitFor('input.quantity__input');
+    const quantityField = qs('.product-form__quantity');
+    const realButton = qs('.product-form__submit');
+    const realButtonText = realButton?.querySelector('span');
+    if (!quantityInput || !quantityField || !realButton || !realButtonText) return;
 
-//Ajout du texte en dessous du selecteur de parfum
-var parfumtitle = document.querySelector("div.pplr-dropdown");
-var selectparfum = document.querySelector("select.pplr_select");
-var onchangeselect = selectparfum.getAttribute("onchange");
-selectparfum.setAttribute("onchange", onchangeselect + "changetexteparfum();");
-var parfumtext = document.createElement("p");
-parfumtext.classList.add("parfumtext");
-parfumtitle.appendChild(parfumtext)
-changetexteparfum()
+    addStepHeading(quantityField, 4, 'Quantité', 'Le prix unitaire baisse automatiquement.');
+    [qs('.listprice'), qs('.progress-container'), qs('.kgeco')].forEach((element) => { if (element) element.hidden = true; });
 
-  /*
-  
-//Ajout de l'image info parfums de Grasse
-var divgrasse = document.createElement ("div");
-var positionref2 = document.querySelector("div.parfumtitle");
-positionref2.appendChild(divgrasse);
-divgrasse.classList.add("divgrasse");
-var infograsse = document.createElement("p");
-var iconeparfum = document.createElement("img");
-iconeparfum.setAttribute("src", "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/icone_parfum.jpg?v=1685217755");
-infograsse.innerHTML = "Parfums Premium conçus à Grasse 🇫🇷, capitale mondiale de la parfumerie";
-infograsse.classList.add("infograsse");
-iconeparfum.classList.add("iconeparfum");
-divgrasse.appendChild(iconeparfum);
-divgrasse.appendChild(infograsse);
+    const summary = document.createElement('div');
+    summary.className = 'ae-price-summary';
+    summary.innerHTML = '<div class="ae-price-summary__main"><span data-ae-quantity-label></span><strong data-ae-line-total></strong></div><p data-ae-saving></p><div class="ae-tier-track" aria-hidden="true"><i></i><span>1</span><span>2</span><span>3</span><span>4</span><span>5+</span></div>';
+    quantityField.append(summary);
+    installStickyButton(realButton);
+    const cartQuantity = await getCartQuantity();
 
-  */
+    const update = () => {
+      const lineQuantity = Math.max(1, Number.parseInt(quantityInput.value, 10) || 1);
+      const combinedQuantity = lineQuantity + cartQuantity;
+      const tier = tierFor(combinedQuantity);
+      const total = lineQuantity * tier.unit;
+      const saving = Math.max(0, (lineQuantity * 9.9) - total);
+      qs('[data-ae-quantity-label]', summary).textContent = `${lineQuantity} sent-bon${lineQuantity > 1 ? 's' : ''} · ${money.format(tier.unit)} l’unité`;
+      qs('[data-ae-line-total]', summary).textContent = money.format(total);
+      const savingNode = qs('[data-ae-saving]', summary);
+      if (tier.next) {
+        const missing = Math.max(1, tier.next - combinedQuantity);
+        savingNode.textContent = `Ajoutez ${missing} pièce${missing > 1 ? 's' : ''} pour atteindre la prochaine remise.`;
+      } else {
+        savingNode.textContent = `Meilleur tarif atteint${saving ? ` · Vous économisez ${money.format(saving)}` : ''}.`;
+      }
+      qs('.ae-tier-track i', summary).style.width = `${Math.min(100, (combinedQuantity / 5) * 100)}%`;
+      realButtonText.textContent = `Ajouter mon sent-bon — ${money.format(total)}`;
+      const stickyTotal = document.querySelector('[data-ae-sticky-total]');
+      if (stickyTotal) stickyTotal.textContent = money.format(total);
+      setStep(4, true, false);
+    };
 
-//on transforme la checkbox ajout recharge parfum en bouton
-//var inputrecharge = document.querySelector("div.recharge").parentElement.getElementsByTagName("input");
-//inputrecharge[0].setAttribute('id', 'inputrecharge');
+    quantityInput.addEventListener('input', update);
+    quantityInput.addEventListener('change', update);
+    quantityField.addEventListener('click', () => window.setTimeout(update, 0));
+    update();
+  }
 
-//on insère l'image unchecked
-  /*
-var imgrechargeunchecked = document.createElement("img");
-imgrechargeunchecked.classList.add("imgrecharge-unchecked");
-imgrechargeunchecked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/bouton_recharge_de_parfum.jpg?v=1685308296";
-var srcrecharge = document.getElementById("inputrecharge").parentElement;
-srcrecharge.appendChild(imgrechargeunchecked);
+  async function enhanceZepto() {
+    const uploadButton = await waitFor('.pplrfileuploadbutton');
+    const shapeContainer = await waitFor('.pplr_thumb_image');
+    const fragrance = await waitFor('select.pplr_select');
 
-//on insère l'image checked
-var imgrechargechecked = document.createElement("img");
-imgrechargechecked.classList.add("imgrecharge-checked");
-imgrechargechecked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/bouton_recharge_de_parfum_check.jpg?v=1685355006";
-var srcrecharge = document.getElementById("inputrecharge").parentElement;
-srcrecharge.appendChild(imgrechargechecked);
-  
-//Ajout du texte sous le bouton ajouter recharge
-var rechargetext = document.createElement("p");
-rechargetext.classList.add("rechargetext");
-rechargetext.innerHTML = "ℹ️ Spray de 1 ml - prolonge la durée de vie de ton sent-bon, découvre d'autres senteurs, etc.";
-srcrecharge.appendChild(rechargetext);
+    if (uploadButton) {
+      uploadButton.textContent = 'Importer ma photo';
+      uploadButton.setAttribute('aria-label', 'Importer une photo à personnaliser');
+      addStepHeading(uploadButton, 1, 'Votre photo', 'JPG, PNG ou HEIC · choisissez une image nette.');
+      const uploadField = closestField(uploadButton);
+      const fileInput = uploadField?.querySelector('input[type="file"]') || qs('.product-personalizer input[type="file"]');
+      if (fileInput) fileInput.addEventListener('change', () => {
+        const complete = fileInput.files.length > 0;
+        setStep(1, complete, !complete);
+        setStep(2, false, complete);
+      });
+    }
 
+    if (shapeContainer) {
+      addStepHeading(shapeContainer, 2, 'Forme', 'Choisissez le format qui convient le mieux à votre photo.');
+      const swatches = qsa('.pplr-swatch-element', shapeContainer);
+      swatches.forEach((swatch, index) => {
+        const raw = swatch.querySelector('.img_dropdown')?.textContent?.trim();
+        const label = raw || ['Rond', 'Portrait', 'Paysage', 'Carré'][index] || `Forme ${index + 1}`;
+        swatch.setAttribute('role', 'button');
+        swatch.setAttribute('aria-label', label);
+        if (!swatch.querySelector('.ae-shape-label')) {
+          const text = document.createElement('span');
+          text.className = 'ae-shape-label';
+          text.textContent = label;
+          swatch.append(text);
+        }
+      });
+      shapeContainer.addEventListener('click', (event) => {
+        const swatch = event.target.closest('.pplr-swatch-element');
+        if (!swatch) return;
+        qsa('.pplr-swatch-element', shapeContainer).forEach((item) => item.setAttribute('aria-pressed', String(item === swatch)));
+        setStep(2, true, false);
+        setStep(3, false, true);
+      });
+      const selected = qs('.pplr-swatch-element.selected', shapeContainer);
+      if (selected) selected.setAttribute('aria-pressed', 'true');
+    }
 
-//Déplacement de la dropdown parfum en dessous du bouton ajouter recharge
-var checkboxrecharge = document.getElementById("inputrecharge");
-var onchangerecharge = checkboxrecharge.getAttribute("onchange");
-checkboxrecharge.setAttribute("onchange", onchangerecharge + "dropdownrecharge();");
+    if (fragrance) {
+      addStepHeading(fragrance, 3, 'Parfum', 'Sélectionnez la senteur qui vous ressemble.');
+      if (![...fragrance.options].some((option) => option.value === '')) {
+        fragrance.prepend(new Option('Choisissez votre parfum', '', true, true));
+      }
+      fragrance.value = '';
+      fragrance.required = true;
+      fragrance.setAttribute('aria-describedby', 'ae-fragrance-help');
+      const help = document.createElement('p');
+      help.id = 'ae-fragrance-help';
+      help.className = 'ae-field-help';
+      help.textContent = 'Votre choix est requis avant l’ajout au panier.';
+      fragrance.insertAdjacentElement('afterend', help);
+      fragrance.dispatchEvent(new Event('change', { bubbles: true }));
+      fragrance.addEventListener('change', () => {
+        const complete = Boolean(fragrance.value);
+        help.hidden = complete;
+        setStep(3, complete, !complete);
+        setStep(4, false, complete);
+      });
 
-  
-//on transforme la checkbox ajout image suppl en bouton
-var inputaddimage = document.querySelector("div.addimage").parentElement.getElementsByTagName("input");
-inputaddimage[0].setAttribute('id', 'inputaddimage');
+      const form = fragrance.closest('form') || qs('form[action*="/cart/add"]');
+      if (form) form.addEventListener('submit', (event) => {
+        if (fragrance.value) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        help.hidden = false;
+        fragrance.focus();
+        fragrance.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, true);
+    }
+  }
 
-//on insère l'image unchecked
-var addimageunchecked = document.createElement("img");
-addimageunchecked.classList.add("addimage-unchecked");
-addimageunchecked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/bouton_ajouter_image_suppl_1706a340-6d17-47e5-b84d-c9f32786295b.jpg?v=1685392468";
-var srcaddimage = document.getElementById("inputaddimage").parentElement;
-srcaddimage.appendChild(addimageunchecked);
+  async function loadCustomerProof() {
+    const proof = qs('[data-ae-product-proof]');
+    const grid = qs('[data-ae-product-proof-grid]');
+    if (!proof || !grid) return;
+    try {
+      const url = new URL(proof.dataset.apiUrl);
+      if (url.protocol !== 'https:') return;
+      url.searchParams.set('action', 'summary');
+      url.searchParams.set('product_handle', proof.dataset.productHandle);
+      const response = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!response.ok) return;
+      const data = await response.json();
+      const photos = (data.photos || []).slice(0, 4);
+      if (!photos.length) return;
+      photos.forEach((source, index) => {
+        const image = document.createElement('img');
+        image.src = source;
+        image.alt = `Création personnalisée d’un client ${index + 1}`;
+        image.loading = 'lazy';
+        image.width = 180;
+        image.height = 180;
+        grid.append(image);
+      });
+      const link = qs('a', proof);
+      if (link && data.count) link.textContent = `Voir les ${data.count} avis`;
+      proof.hidden = false;
+    } catch (_) { proof.hidden = true; }
+  }
 
-//on insère l'image checked
-var addimagechecked = document.createElement("img");
-addimagechecked.classList.add("addimage-checked");
-addimagechecked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/bouton_image_suppl_vert.jpg?v=1685385884";
-var srcaddimage = document.getElementById("inputaddimage").parentElement;
-srcaddimage.appendChild(addimagechecked);
-  
-
-//Ajout du texte sous le bouton ajouter image suppl
-var addimagetext = document.createElement("p");
-addimagetext.classList.add("addimagetext");
-addimagetext.innerHTML = "ℹ️ Une moitié des pièces avec la 1ère image et l'autre moitié avec la 2ème image";
-srcaddimage.appendChild(addimagetext);
-  
-
-//modif onchange de la checkbox ajout image suppl
-var checkboxaddimage = document.getElementById("inputaddimage");
-var onchangeaddimage = checkboxaddimage.getAttribute("onchange");
-checkboxaddimage.setAttribute("onchange", onchangeaddimage + "modifaddimage();");
-  
-//Ajout du texte au dessus du titre des packs
-var bundletitle = document.querySelector("div.bundletitle");
-var bundletext = document.createElement("p");
-bundletext.classList.add("bundletext");
-  
-//bundletext.innerHTML = "Fais des réserves ou offre-en autour de toi ! Chaque sent-bon est soigneusement emballé pour préserver son parfum en attendant son utilisation.<br>";
-// bundletext.innerHTML = "ℹ️ Les sent-bon se conservent sans limite de temps !<br>";
-  
-//var positionref = document.querySelector("div.pplr-checkbox label.pplrlabel");
-var positionref = document.querySelector("div.bundletitle");
-positionref.appendChild(bundletext)
-
-*/
-  
-//------------ on transforme les checkbox en bundles
-
-/*
-  
-//------------ checkbox 0
-
-//on trouve la checkbox et on lui met un ID pour la retrouver facilement
-var input0 = document.querySelector("input[data-value='1 pièce']");
-input0.setAttribute('id', 'input0');
-
-//on insère l'image unchecked de la 0ère checkbox
-var img0unchecked = document.createElement("img");
-img0unchecked.classList.add("img0-unchecked");
-img0unchecked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/Bundle_0_gris.jpg?v=1687814237";
-var src0 = document.getElementById("input0").parentElement;
-src0.appendChild(img0unchecked);
-
-//on insère l'image checked de la 0ère checkbox
-var img0checked = document.createElement("img");
-img0checked.classList.add("img0-checked");
-img0checked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/Bundle_0_vert.jpg?v=1687814237";
-var src0 = document.getElementById("input0").parentElement;
-src0.appendChild(img0checked);
-
-//on enlève le texte de la 0ère checkbox
-document.getElementById("input0").nextSibling.remove();
-
-*/
-
-
-  
-//------------ checkbox 1
-
-//on trouve la checkbox et on lui met un ID pour la retrouver facilement
-
-  /*
-  
-var input1 = document.querySelector("input[data-value='2 pièces']");
-input1.setAttribute('id', 'input1');
-
-  
-
-//on insère l'image unchecked de la 1ère checkbox
-var img1unchecked = document.createElement("img");
-img1unchecked.classList.add("img1-unchecked");
-img1unchecked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/Bundle_1_gris_82815d71-4c49-46a9-9401-6206c8fa849f.jpg?v=1691408220";
-var src1 = document.getElementById("input1").parentElement;
-src1.appendChild(img1unchecked);
-
-//on insère l'image checked de la 1ère checkbox
-var img1checked = document.createElement("img");
-img1checked.classList.add("img1-checked");
-img1checked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/Bundle_1_vert_0c8fedaf-8ee5-43c4-9adc-5096ef058fea.jpg?v=1691408220";
-var src1 = document.getElementById("input1").parentElement;
-src1.appendChild(img1checked);
-
-//on enlève le texte de la 1ère checkbox
-document.getElementById("input1").nextSibling.remove();
-  
-//------------- on passe à la 2ème checkbox
-
-//on trouve la checkbox et on lui met un ID pour la retrouver facilement
-var input2 = document.querySelector("input[data-value='3 achetés + 1 offert']");
-input2.setAttribute('id', 'input2');
-
-//on insère l'image unchecked de la 2ème checkbox
-var img2unchecked = document.createElement("img");
-img2unchecked.classList.add("img2-unchecked");
-img2unchecked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/Bundle_2_gris_b9aee380-ba43-4483-84c7-1b368946b7d8.jpg?v=1691408220";
-var src2 = document.getElementById("input2").parentElement;
-src2.appendChild(img2unchecked);
-
-//on insère l'image checked de la 2ème checkbox
-var img2checked = document.createElement("img");
-img2checked.classList.add("img2-checked");
-img2checked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/Bundle_2_vert_f3fdc8a0-4aeb-43e1-a5ae-e50c5119d49e.jpg?v=1691408220";
-var src2 = document.getElementById("input2").parentElement;
-src2.appendChild(img2checked);
-
-//on enlève le texte de la 2ème checkbox
-document.getElementById("input2").nextSibling.remove();
-
-//------------- on passe à la 3ème checkbox
-
-//on trouve la checkbox et on lui met un ID pour la retrouver facilement
-var input3 = document.querySelector("input[data-value='4 achetés + 2 offerts']");
-input3.setAttribute('id', 'input3');
-
-//on insère l'image unchecked de la 3ème checkbox
-var img3unchecked = document.createElement("img");
-img3unchecked.classList.add("img3-unchecked");
-img3unchecked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/Bundle_3_gris_32f467c4-95fe-4f5e-8127-c79f1aecd81b.jpg?v=1691408220";
-var src3 = document.getElementById("input3").parentElement;
-src3.appendChild(img3unchecked);
-
-//on insère l'image checked de la 3ème checkbox
-var img3checked = document.createElement("img");
-img3checked.classList.add("img3-checked");
-img3checked.src = "https://cdn.shopify.com/s/files/1/0769/3831/4030/files/Bundle_3_vert_9de8e4b4-7136-484c-a317-7f6d32f3b1a5.jpg?v=1691408220";
-var src3 = document.getElementById("input3").parentElement;
-src3.appendChild(img3checked);
-
-//on enlève le texte de la 3ème checkbox
-document.getElementById("input3").nextSibling.remove();
-
-  */
-  
-}
+  Promise.allSettled([enhanceZepto(), enhanceQuantity(), loadCustomerProof()]);
+})();

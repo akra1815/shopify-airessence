@@ -102,6 +102,10 @@
       url.searchParams.set('action', 'summary');
       url.searchParams.set('product_handle', root.dataset.productHandle);
       const data = await api(url);
+      if (Number(data.count || 0) <= 0) {
+        root.hidden = true;
+        return;
+      }
       qs(root, '[data-ae-summary-text]').textContent = `${Number(data.average || 0).toFixed(1)}/5 selon ${data.count || 0} avis`;
     } catch (_) {
       root.hidden = true;
@@ -212,7 +216,7 @@
     }));
     qs(root, '[data-ae-sort]').addEventListener('change', (event) => { state.sort = event.target.value; load(true); });
     more.addEventListener('click', () => load(false));
-    qs(root, '[data-ae-open-form]').addEventListener('click', () => formDialog.showModal());
+    qs(root, '[data-ae-open-form]')?.addEventListener('click', () => formDialog.showModal());
     qs(root, '[data-ae-close]').addEventListener('click', () => formDialog.close());
     formDialog.addEventListener('click', (event) => { if (event.target === formDialog) formDialog.close(); });
 

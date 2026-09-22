@@ -28,7 +28,11 @@
     item.classList.toggle('is-active', active);
   };
 
-  const closestField = (element) => element?.closest('.pplr-wrapper, .pplr-field, .pplr-customization, .pplr-option') || element?.parentElement;
+  const closestField = (element) => {
+    if (!element) return null;
+    if (element.matches('.product-form__quantity')) return element;
+    return element.closest('.pplr-wrapper, .pplr-field, .pplr-customization, .pplr-option') || element.parentElement;
+  };
 
   function addStepHeading(element, step, title, help = '') {
     const field = closestField(element);
@@ -78,7 +82,7 @@
     const quantityField = qs('.product-form__quantity');
     const realButton = qs('.product-form__submit');
     const realButtonText = realButton?.querySelector('span');
-    if (!quantityInput || !quantityField || !realButton || !realButtonText) return;
+    if (!quantityInput || !quantityField || !realButton || !realButtonText) return null;
 
     addStepHeading(quantityField, 4, 'Quantité', 'Le prix unitaire baisse automatiquement.');
     [qs('.listprice'), qs('.progress-container'), qs('.kgeco')].forEach((element) => { if (element) element.hidden = true; });
@@ -109,13 +113,17 @@
       realButtonText.textContent = `Ajouter mon sent-bon — ${money.format(total)}`;
       const stickyTotal = document.querySelector('[data-ae-sticky-total]');
       if (stickyTotal) stickyTotal.textContent = money.format(total);
-      setStep(4, true, false);
     };
 
     quantityInput.addEventListener('input', update);
-    quantityInput.addEventListener('change', update);
+    quantityInput.addEventListener('change', () => {
+      update();
+      setStep(4, true, false);
+    });
     quantityField.addEventListener('click', () => window.setTimeout(update, 0));
     update();
+    const productForm = realButton.closest('product-form');
+    return { quantityField, buttonBlock: productForm?.parentElement || productForm };
   }
 
   async function enhanceZepto() {
@@ -124,10 +132,23 @@
     const fragrance = await waitFor('select.pplr_select');
 
     if (uploadButton) {
-      uploadButton.textContent = 'Importer ma photo';
-      uploadButton.setAttribute('aria-label', 'Importer une photo à personnaliser');
-      addStepHeading(uploadButton, 1, 'Votre photo', 'JPG, PNG ou HEIC · choisissez une image nette.');
       const uploadField = closestField(uploadButton);
+      const normalizeUploadControls = () => {
+        const buttons = qsa('.pplrfileuploadbutton');
+        buttons.forEach((button, index) => {
+          button.textContent = 'Importer ma photo';
+          button.setAttribute('aria-label', 'Importer une photo à personnaliser');
+          if (index === 0) return;
+          const duplicateField = closestField(button);
+          if (duplicateField && duplicateField !== uploadField) duplicateField.hidden = true;
+          else button.hidden = true;
+        });
+      };
+      normalizeUploadControls();
+      const uploadObserver = new MutationObserver(normalizeUploadControls);
+      uploadObserver.observe(root, { childList: true, subtree: true });
+      window.setTimeout(() => uploadObserver.disconnect(), 8000);
+      addStepHeading(uploadButton, 1, 'Votre photo', 'JPG, PNG ou HEIC · choisissez une image nette.');
       const fileInput = uploadField?.querySelector('input[type="file"]') || qs('.product-personalizer input[type="file"]');
       if (fileInput) fileInput.addEventListener('change', () => {
         const complete = fileInput.files.length > 0;
@@ -193,6 +214,13 @@
         fragrance.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, true);
     }
+    return { fragrance, fragranceField: closestField(fragrance) };
+  }
+
+  function arrangeConfigurator(zepto, quantity) {
+    if (!zepto?.fragranceField || !quantity?.quantityField || !quantity?.buttonBlock) return;
+    zepto.fragranceField.insertAdjacentElement('afterend', quantity.quantityField);
+    quantity.quantityField.insertAdjacentElement('afterend', quantity.buttonBlock);
   }
 
   async function loadCustomerProof() {
@@ -224,5 +252,8 @@
     } catch (_) { proof.hidden = true; }
   }
 
-  Promise.allSettled([enhanceZepto(), enhanceQuantity(), loadCustomerProof()]);
+  Promise.all([enhanceZepto(), enhanceQuantity()])
+    .then(([zepto, quantity]) => arrangeConfigurator(zepto, quantity))
+    .catch(() => {});
+  loadCustomerProof();
 })();

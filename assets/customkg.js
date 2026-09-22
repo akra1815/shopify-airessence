@@ -136,8 +136,10 @@
       const normalizeUploadControls = () => {
         const buttons = qsa('.pplrfileuploadbutton');
         buttons.forEach((button, index) => {
-          button.textContent = 'Importer ma photo';
-          button.setAttribute('aria-label', 'Importer une photo à personnaliser');
+          if (button.textContent.trim() !== 'Importer ma photo') button.textContent = 'Importer ma photo';
+          if (button.getAttribute('aria-label') !== 'Importer une photo à personnaliser') {
+            button.setAttribute('aria-label', 'Importer une photo à personnaliser');
+          }
           if (index === 0) return;
           const duplicateField = closestField(button);
           if (duplicateField && duplicateField !== uploadField) duplicateField.hidden = true;
@@ -145,9 +147,8 @@
         });
       };
       normalizeUploadControls();
-      const uploadObserver = new MutationObserver(normalizeUploadControls);
-      uploadObserver.observe(root, { childList: true, subtree: true });
-      window.setTimeout(() => uploadObserver.disconnect(), 8000);
+      window.setTimeout(normalizeUploadControls, 500);
+      window.setTimeout(normalizeUploadControls, 1500);
       addStepHeading(uploadButton, 1, 'Votre photo', 'JPG, PNG ou HEIC · choisissez une image nette.');
       const fileInput = uploadField?.querySelector('input[type="file"]') || qs('.product-personalizer input[type="file"]');
       if (fileInput) fileInput.addEventListener('change', () => {

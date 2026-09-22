@@ -123,14 +123,6 @@
     update();
   }
 
-  async function enhanceZepto() {
-    const uploadButton = await waitFor('.pplrfileuploadbutton');
-    if (uploadButton) {
-      if (uploadButton.textContent.trim() !== 'Importer ma photo') uploadButton.textContent = 'Importer ma photo';
-      uploadButton.setAttribute('aria-label', 'Importer une photo à personnaliser');
-    }
-  }
-
   async function loadCustomerProof() {
     const proof = qs('[data-ae-product-proof]');
     const grid = qs('[data-ae-product-proof-grid]');
@@ -160,6 +152,6 @@
     } catch (_) { proof.hidden = true; }
   }
 
-  Promise.allSettled([enhanceZepto(), enhanceQuantity()]);
+  enhanceQuantity();
   loadCustomerProof();
 })();

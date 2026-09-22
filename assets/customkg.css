@@ -730,11 +730,6 @@ color: #00B894;
   text-transform: none !important;
 }
 
-.ae-personalized-product .pplrfileuploadbutton[hidden],
-.ae-personalized-product [hidden] {
-  display: none !important;
-}
-
 .ae-personalized-product .pplr-swatch-main {
   display: flex;
   flex-wrap: wrap;

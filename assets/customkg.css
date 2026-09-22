@@ -727,7 +727,23 @@ color: #00B894;
   font-weight: 650 !important;
   justify-content: center;
   min-height: 5rem;
+  position: relative;
   text-transform: none !important;
+}
+
+.ae-personalized-product .pplrfileuploadbutton::after {
+  align-items: center;
+  background: #00b894;
+  border-radius: .9rem;
+  color: #fff;
+  content: 'Importer ma photo';
+  display: flex;
+  font-size: 1.45rem;
+  font-weight: 650;
+  inset: 0;
+  justify-content: center;
+  pointer-events: none;
+  position: absolute;
 }
 
 .ae-personalized-product .pplr-swatch-main {

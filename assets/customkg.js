@@ -7,7 +7,6 @@
 
   const money = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
   const qs = (selector, scope = root) => scope.querySelector(selector);
-  const qsa = (selector, scope = root) => [...scope.querySelectorAll(selector)];
   const waitFor = (selector, timeout = 12000) => new Promise((resolve) => {
     const existing = qs(selector);
     if (existing) return resolve(existing);
@@ -122,106 +121,14 @@
     });
     quantityField.addEventListener('click', () => window.setTimeout(update, 0));
     update();
-    const productForm = realButton.closest('product-form');
-    return { quantityField, buttonBlock: productForm?.parentElement || productForm };
   }
 
   async function enhanceZepto() {
     const uploadButton = await waitFor('.pplrfileuploadbutton');
-    const shapeContainer = await waitFor('.pplr_thumb_image');
-    const fragrance = await waitFor('select.pplr_select');
-
     if (uploadButton) {
-      const uploadField = closestField(uploadButton);
-      const normalizeUploadControls = () => {
-        const buttons = qsa('.pplrfileuploadbutton');
-        buttons.forEach((button, index) => {
-          if (button.textContent.trim() !== 'Importer ma photo') button.textContent = 'Importer ma photo';
-          if (button.getAttribute('aria-label') !== 'Importer une photo à personnaliser') {
-            button.setAttribute('aria-label', 'Importer une photo à personnaliser');
-          }
-          if (index === 0) return;
-          const duplicateField = closestField(button);
-          if (duplicateField && duplicateField !== uploadField) duplicateField.hidden = true;
-          else button.hidden = true;
-        });
-      };
-      normalizeUploadControls();
-      window.setTimeout(normalizeUploadControls, 500);
-      window.setTimeout(normalizeUploadControls, 1500);
-      addStepHeading(uploadButton, 1, 'Votre photo', 'JPG, PNG ou HEIC · choisissez une image nette.');
-      const fileInput = uploadField?.querySelector('input[type="file"]') || qs('.product-personalizer input[type="file"]');
-      if (fileInput) fileInput.addEventListener('change', () => {
-        const complete = fileInput.files.length > 0;
-        setStep(1, complete, !complete);
-        setStep(2, false, complete);
-      });
+      if (uploadButton.textContent.trim() !== 'Importer ma photo') uploadButton.textContent = 'Importer ma photo';
+      uploadButton.setAttribute('aria-label', 'Importer une photo à personnaliser');
     }
-
-    if (shapeContainer) {
-      addStepHeading(shapeContainer, 2, 'Forme', 'Choisissez le format qui convient le mieux à votre photo.');
-      const swatches = qsa('.pplr-swatch-element', shapeContainer);
-      swatches.forEach((swatch, index) => {
-        const raw = swatch.querySelector('.img_dropdown')?.textContent?.trim();
-        const label = raw || ['Rond', 'Portrait', 'Paysage', 'Carré'][index] || `Forme ${index + 1}`;
-        swatch.setAttribute('role', 'button');
-        swatch.setAttribute('aria-label', label);
-        if (!swatch.querySelector('.ae-shape-label')) {
-          const text = document.createElement('span');
-          text.className = 'ae-shape-label';
-          text.textContent = label;
-          swatch.append(text);
-        }
-      });
-      shapeContainer.addEventListener('click', (event) => {
-        const swatch = event.target.closest('.pplr-swatch-element');
-        if (!swatch) return;
-        qsa('.pplr-swatch-element', shapeContainer).forEach((item) => item.setAttribute('aria-pressed', String(item === swatch)));
-        setStep(2, true, false);
-        setStep(3, false, true);
-      });
-      const selected = qs('.pplr-swatch-element.selected', shapeContainer);
-      if (selected) selected.setAttribute('aria-pressed', 'true');
-    }
-
-    if (fragrance) {
-      addStepHeading(fragrance, 3, 'Parfum', 'Sélectionnez la senteur qui vous ressemble.');
-      if (![...fragrance.options].some((option) => option.value === '')) {
-        fragrance.prepend(new Option('Choisissez votre parfum', '', true, true));
-      }
-      fragrance.value = '';
-      fragrance.required = true;
-      fragrance.setAttribute('aria-describedby', 'ae-fragrance-help');
-      const help = document.createElement('p');
-      help.id = 'ae-fragrance-help';
-      help.className = 'ae-field-help';
-      help.textContent = 'Votre choix est requis avant l’ajout au panier.';
-      fragrance.insertAdjacentElement('afterend', help);
-      fragrance.dispatchEvent(new Event('change', { bubbles: true }));
-      fragrance.addEventListener('change', () => {
-        const complete = Boolean(fragrance.value);
-        help.hidden = complete;
-        setStep(3, complete, !complete);
-        setStep(4, false, complete);
-      });
-
-      const form = fragrance.closest('form') || qs('form[action*="/cart/add"]');
-      if (form) form.addEventListener('submit', (event) => {
-        if (fragrance.value) return;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        help.hidden = false;
-        fragrance.focus();
-        fragrance.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, true);
-    }
-    return { fragrance, fragranceField: closestField(fragrance) };
-  }
-
-  function arrangeConfigurator(zepto, quantity) {
-    if (!zepto?.fragranceField || !quantity?.quantityField || !quantity?.buttonBlock) return;
-    zepto.fragranceField.insertAdjacentElement('afterend', quantity.quantityField);
-    quantity.quantityField.insertAdjacentElement('afterend', quantity.buttonBlock);
   }
 
   async function loadCustomerProof() {
@@ -253,8 +160,6 @@
     } catch (_) { proof.hidden = true; }
   }
 
-  Promise.all([enhanceZepto(), enhanceQuantity()])
-    .then(([zepto, quantity]) => arrangeConfigurator(zepto, quantity))
-    .catch(() => {});
+  Promise.allSettled([enhanceZepto(), enhanceQuantity()]);
   loadCustomerProof();
 })();
